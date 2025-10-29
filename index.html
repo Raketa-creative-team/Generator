@@ -1,287 +1,270 @@
 <html>
-  <head>
-    <title>Pixels generator</title>
-    <script>
-      function trim_arrange(value) {
-        value = value.replace(" ", "");
-        value = value.split(",");
-        return value;
-      }
 
-      function fillValues(URL, rules) {
-        var theURL = URL;
-        var ruleKeys = Object.keys(rules);
+<head>
+  <title>Pixels generator</title>
+  <style>
+    .wrapper {
+      width: 1024px;
+      height: auto;
+      background-color: rgb(129, 129, 163);
+    }
 
-        ruleKeys.forEach(function (key) {
-          //key = macro
-          //rules[key] = value
-          console.log();
-          theURL = theURL.replace(key, rules[key]);
-        });
+    .inputsWrapper {
+      padding: 10px;
+      margin: 0 auto;
+    }
 
-        return theURL;
-      }
+    .title {
+      font-size: 28px;
+      color: #000;
+    }
 
-      function generatePixels() {
-        result = {};
+    .input {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+    }
 
-        let studioCids = trim_arrange(
-          document.getElementsByClassName("studioCidInput")[0].value
-        );
-        let gID = trim_arrange(
-          document.getElementsByClassName("gidInput")[0].value
-        );
-        let cIDs = trim_arrange(
-          document.getElementsByClassName("cidInput")[0].value
-        );
+    .input .submit {
+      margin: 0 auto;
+    }
 
-        let interactions =
-          document.getElementsByClassName("interactionInput")[0].value;
-        interactions = interactions.replace(", ", ",");
-        // interactions = interactions.split(",");
-        interactions = interactions.split(/\r?\n/);
+    .inputForm {
+      display: inline-block;
+      height: 100%;
+      margin-left: 40px;
+    }
 
-        interactions = interactions.map(function (interaction) {
-          return encodeURIComponent(interaction);
-        });
+    .inputForm input {
+      border-radius: 5px;
+      border: none;
+      height: 100%;
+      padding: 10px;
+    }
 
-        let default_pixelURL =
-          "https://studio-t.teads.tv/track?action=studio_%23{ACTION_NAME_ENCODED}&studio_cid={STUDIO_CID}&referer=&ts=1658322119706&studio_canvas=Main%20canvas&studio_segment=Default%20segment&gid={GID}&cid={CID}&pid=1&env=js-web&slot=native";
-        let resultString = "";
+    .inputForm textarea {
+      border-radius: 5px;
+      border: none;
+    }
 
-        cIDs.forEach(function (cID) {
-          studioCids.forEach(function (studioCid) {
-            interactions.forEach(function (interaction) {
-              if (result[cID] === undefined) result[cID] = {};
+    .subTitle {
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      color: #000;
+      padding: 20px;
+      width: 250px;
+    }
 
-              if (result[cID][studioCid] === undefined)
-                result[cID][studioCid] = {};
+    .subTitleText {
+      display: inline-block;
+    }
 
-              result[cID][studioCid][interaction] = fillValues(
-                default_pixelURL,
-                {
-                  "{ACTION_NAME_ENCODED}": interaction,
-                  "{STUDIO_CID}": studioCid,
-                  "{GID}": gID,
-                  "{CID}": cID,
-                }
-              );
+    .info,
+    .info img {
+      display: flex;
+      height: 25px;
+      padding-left: 5px;
+    }
 
-              resultString +=
-                result[cID][studioCid][interaction] +
-                `
-                            `;
+    .info.gidInfo img:hover+.infoText.gidInfo {
+      display: inline-block;
+    }
 
-              console.log(result[cID][studioCid][interaction]);
-            });
-          });
-        });
+    .info.cidInfo img:hover+.infoText.cidInfo {
+      display: inline-block;
+    }
 
-        document.getElementById("results").innerText = resultString;
+    .infoText {
+      position: absolute;
+      margin-top: -20px;
+      display: none;
+      font-size: 18px;
+      background-color: rgb(151, 179, 169);
+    }
 
-        // console.log(result);
-        return result;
-      }
+    .submit {
+      padding: 20px;
+      border: none;
+      border-radius: 5px;
+      color: #000;
+      font-size: 26px;
+      font-weight: bold;
+      background-color: white;
+      cursor: pointer;
+    }
 
-      this.fillTeadsFormFields = function (text) {
-        const insertionIdMatch = text.match(/Insertion ID:\s*(\d+)/);
-        const creativeIdMatch = text.match(/Creative ID:\s*(\d+)/);
-        const vastIdMatch = text.match(/vast\/(\d+)/i);
+    .separator {
+      height: 30px;
+      border-top: 1px solid rgb(13, 51, 53);
+      width: 700px;
+      margin: 0 auto;
+    }
 
-        const insertionId = insertionIdMatch ? insertionIdMatch[1] : "";
-        const creativeId = creativeIdMatch ? creativeIdMatch[1] : "";
-        const vastId = vastIdMatch ? vastIdMatch[1] : "";
+    .outputsWrapper {
+      padding: 10px;
+    }
 
-        const studioCidInput = document.querySelector(".studioCidInput");
-        const gidInput = document.querySelector(".gidInput");
-        const cidInput = document.querySelector(".cidInput");
+    .dataTable {
+      width: 100%;
+      border: 1px solid rgb(47, 34, 48);
+      border-radius: 5px;
+    }
+  </style>
+</head>
 
-        if (studioCidInput) studioCidInput.value = vastId;
-        if (gidInput) gidInput.value = insertionId;
-        if (cidInput) cidInput.value = creativeId;
-      };
-    </script>
-    <style>
-      .wrapper {
-        width: 1024px;
-        height: auto;
-        background-color: rgb(129, 129, 163);
-      }
-
-      .inputsWrapper {
-        padding: 10px;
-        margin: 0 auto;
-      }
-
-      .title {
-        font-size: 28px;
-        color: #000;
-      }
-
-      .input {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-      }
-
-      .input .submit {
-        margin: 0 auto;
-      }
-
-      .inputForm {
-        display: inline-block;
-        height: 100%;
-        margin-left: 40px;
-      }
-
-      .inputForm input {
-        border-radius: 5px;
-        border: none;
-        height: 100%;
-        padding: 10px;
-      }
-
-      .inputForm textarea {
-        border-radius: 5px;
-        border: none;
-      }
-
-      .subTitle {
-        display: flex;
-        align-items: center;
-        font-size: 22px;
-        color: #000;
-        padding: 20px;
-        width: 80px;
-      }
-
-      .subTitleText {
-        display: inline-block;
-      }
-
-      .info,
-      .info img {
-        display: flex;
-        height: 25px;
-        padding-left: 5px;
-      }
-
-      .info.gidInfo img:hover + .infoText.gidInfo {
-        display: inline-block;
-      }
-
-      .info.cidInfo img:hover + .infoText.cidInfo {
-        display: inline-block;
-      }
-
-      .infoText {
-        position: absolute;
-        margin-top: -20px;
-        display: none;
-        font-size: 18px;
-        background-color: rgb(151, 179, 169);
-      }
-
-      .submit {
-        padding: 20px;
-        border: none;
-        border-radius: 5px;
-        color: #000;
-        font-size: 26px;
-        font-weight: bold;
-        background-color: white;
-        cursor: pointer;
-      }
-
-      .separator {
-        height: 30px;
-        border-top: 1px solid rgb(13, 51, 53);
-        width: 700px;
-        margin: 0 auto;
-      }
-
-      .outputsWrapper {
-        padding: 10px;
-      }
-
-      .dataTable {
-        width: 100%;
-        border: 1px solid rgb(47, 34, 48);
-        border-radius: 5px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="wrapper">
-      <div class="inputsWrapper">
-        <div class="input">
-          <div class="subTitle">
-            <div class="subtitleText">Studio CID</div>
-          </div>
-          <div class="inputForm">
-            <textarea
-              class="studioCidInput"
-              type="text"
-              rows="10"
-              cols="70"
-            ></textarea>
-          </div>
+<body>
+  <div class="wrapper">
+    <div class="inputsWrapper">
+      <div class="input">
+        <div class="subTitle">
+          <div class="subtitleText">Studio Creative id (vast id)</div>
         </div>
-        <div class="input">
-          <div class="subTitle">
-            <div class="subtitleText">GID InsertionID</div>
-            <div class="info gidInfo">
-              <img src="assets/info.png" />
-              <div class="infoText gidInfo">Line item ID</div>
-            </div>
-          </div>
-          <div class="inputForm">
-            <input class="gidInput" type="text" size="30" />
-          </div>
-        </div>
-        <div class="input">
-          <div class="subTitle">
-            <div class="subtitleText">CID</div>
-            <div class="info cidInfo">
-              <img src="assets/info.png" />
-              <div class="infoText cidInfo">Creative ID</div>
-            </div>
-          </div>
-          <div class="inputForm">
-            <textarea
-              class="cidInput"
-              type="text"
-              rows="10"
-              cols="70"
-            ></textarea>
-          </div>
-        </div>
-        <div class="input">
-          <div class="subTitle">
-            <div class="subtitleText">Interaction Names</div>
-          </div>
-          <div class="inputForm">
-            <textarea
-              class="interactionInput"
-              type="text"
-              rows="10"
-              cols="70"
-            ></textarea>
-          </div>
-        </div>
-        <div class="input">
-          <input
-            type="button"
-            class="submit"
-            value="Generate Pixels"
-            onclick="generatePixels()"
-          />
+        <div class="inputForm">
+          <textarea class="studioCidInput" type="text" rows="10" cols="70"></textarea>
         </div>
       </div>
-      <div class="separator"></div>
+      <div class="input">
+        <div class="subTitle">
+          <div class="subtitleText">Gid Insertion ID</div>
+          <div class="info gidInfo">
+            <img src="assets/info.png" />
+            <div class="infoText gidInfo">Line item ID</div>
+          </div>
+        </div>
+        <div class="inputForm">
+          <input class="gidInput" type="text" size="30" />
+        </div>
+      </div>
+      <div class="input">
+        <div class="subTitle">
+          <div class="subtitleText">Tam Id</div>
+          <div class="info cidInfo">
+            <img src="assets/info.png" />
+            <div class="infoText cidInfo">Creative ID</div>
+          </div>
+        </div>
+        <div class="inputForm">
+          <textarea class="cidInput" type="text" rows="10" cols="70"></textarea>
+        </div>
+      </div>
+      <div class="input">
+        <div class="subTitle">
+          <div class="subtitleText">Interaction Names</div>
+        </div>
+        <div class="inputForm">
+          <textarea class="interactionInput" type="text" rows="10" cols="70"></textarea>
+        </div>
+      </div>
+      <div class="input">
+        <input type="button" class="submit" value="Generate Pixels" onclick="generatePixels()" />
+      </div>
     </div>
+    <div class="separator"></div>
+  </div>
 
-    <div id="results"></div>
-  </body>
+  <div id="results"></div>
+</body>
+
+<script>
+  function trim_arrange(value) {
+    value = value.replace(" ", "");
+    value = value.split(",");
+    return value;
+  }
+
+  function fillValues(URL, rules) {
+    var theURL = URL;
+    var ruleKeys = Object.keys(rules);
+
+    ruleKeys.forEach(function (key) {
+      //key = macro
+      //rules[key] = value
+      console.log();
+      theURL = theURL.replace(key, rules[key]);
+    });
+
+    return theURL;
+  }
+
+  function generatePixels() {
+    result = {};
+
+    let studioCids = trim_arrange(
+      document.getElementsByClassName("studioCidInput")[0].value
+    );
+    let gID = trim_arrange(
+      document.getElementsByClassName("gidInput")[0].value
+    );
+    let cIDs = trim_arrange(
+      document.getElementsByClassName("cidInput")[0].value
+    );
+
+    let interactions =
+      document.getElementsByClassName("interactionInput")[0].value;
+    interactions = interactions.replace(", ", ",");
+    // interactions = interactions.split(",");
+    interactions = interactions.split(/\r?\n/);
+
+    interactions = interactions.map(function (interaction) {
+      return encodeURIComponent(interaction);
+    });
+
+    let default_pixelURL =
+      "https://studio-t.teads.tv/track?action=studio_%23{ACTION_NAME_ENCODED}&studio_cid={STUDIO_CID}&referer=&ts=1658322119706&studio_canvas=Main%20canvas&studio_segment=Default%20segment&gid={GID}&cid={CID}&pid=1&env=js-web&slot=native";
+    let resultString = "";
+
+    cIDs.forEach(function (cID) {
+      studioCids.forEach(function (studioCid) {
+        interactions.forEach(function (interaction) {
+          if (result[cID] === undefined) result[cID] = {};
+
+          if (result[cID][studioCid] === undefined)
+            result[cID][studioCid] = {};
+
+          result[cID][studioCid][interaction] = fillValues(
+            default_pixelURL,
+            {
+              "{ACTION_NAME_ENCODED}": interaction,
+              "{STUDIO_CID}": studioCid,
+              "{GID}": gID,
+              "{CID}": cID,
+            }
+          );
+
+          resultString +=
+            result[cID][studioCid][interaction] +
+            `
+                            `;
+
+          console.log(result[cID][studioCid][interaction]);
+        });
+      });
+    });
+
+    document.getElementById("results").innerText = resultString;
+
+    // console.log(result);
+    return result;
+  }
+
+  this.fillTeadsFormFields = function (text) {
+    const insertionIdMatch = text.match(/Insertion ID:\s*(\d+)/);
+    const creativeIdMatch = text.match(/Creative ID:\s*(\d+)/);
+    const vastIdMatch = text.match(/vast\/(\d+)/i);
+
+    const insertionId = insertionIdMatch ? insertionIdMatch[1] : "";
+    const creativeId = creativeIdMatch ? creativeIdMatch[1] : "";
+    const vastId = vastIdMatch ? vastIdMatch[1] : "";
+
+    const studioCidInput = document.querySelector(".studioCidInput");
+    const gidInput = document.querySelector(".gidInput");
+    const cidInput = document.querySelector(".cidInput");
+
+    if (studioCidInput) studioCidInput.value = vastId;
+    if (gidInput) gidInput.value = insertionId;
+    if (cidInput) cidInput.value = creativeId;
+  };
+</script>
+
 </html>
